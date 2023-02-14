@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+  backend:
+    depends_on:
+      - remote_listener
+    image: sosci/backend
+    build:
+      context: ../../Apps/backend
+      dockerfile: ./Dockerfile
+
+    restart: always
+
+    environment:
+      - HOST=0.0.0.0:34254
+      - TARGET=remote_listener:34255
+      - FREQUENCY=1.0
+    networks:
+      - internal
+
+    expose:
+      - 34254
+    ports:
+      - 9000:34254
+
+  remote_listener:
+    image: sosci/backend/remote_listener
+    build:
+      context: ../../Apps/backend/test/remote_listener/
+      dockerfile: ./Dockerfile
+
+    container_name: remote_listener
+    restart: always
+    networks:
+      - internal
+
+    expose:
+      - 34255
+
+
+networks:
+  internal:
+    driver: bridge
+    internal: true
+  web:
+    driver: bridge
+
